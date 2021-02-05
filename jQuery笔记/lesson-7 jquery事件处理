@@ -1,0 +1,735 @@
+# lesson-7 jquery事件处理
+
+本章目标：
+
+- 页面加载
+- 事件方法
+- 事件类型
+- 事件对象
+
+##页面加载
+
+**入口函数window.onload和$(function(){})的区别**：
+
+
+
+![mark](http://qiniu.wind-zhou.com/blog/210124/HEGmhH829J.png?imageslim)
+
+
+
+这里可以看出两点不同： 
+
+1. `$(function(){})`不会被覆盖，而`window.onload`会被覆盖，个人感觉`$(function(){})`不会被覆盖的原因是将其放入到了一个队列中，在对应时机一次出队。 
+
+2. `$(function(){})`在`window.onload`执行前执行的，`$(function(){})`类似于原生js中的`DOMContentLoaded`事件，在DOM加载完毕后，页面全部内容（如图片等）完全加载完毕前被执行。而`window.onload`会在页面资源全部加载完毕后才会执行。
+
+**DOM文档加载步骤：** 
+
+1. 解析HTML结构 
+2. 加载外部的脚本和样式文件 
+3. 解析并执行脚本代码 
+4. 执行`$(function(){})`内对应代码 
+5. 加载图片等二进制资源 
+6. 页面加载完毕，执行`window.onload`
+
+## 事件方法
+
+- 绑定事件
+- 触发事件
+- 委派事件
+
+
+
+### 事件绑定
+
+#### bind()
+
+**作用：**
+
+bind() 方法为被选元素添加一个或多个事件处理程序，并规定事件发生时运行的函数。
+
+**语法：**
+
+```js
+$(selector).bind(event,data,function)
+```
+
+| 参数           | 描述                                                         |
+| :------------- | :----------------------------------------------------------- |
+| ***event***    | **必需。<br />**<br />规定添加到元素的一个或多个事件。<br /><br />由空格分隔多个事件。必须是有效的事件。 |
+| *data*         | 可选。<br /><br />规定传递到函数的额外数据。                 |
+| ***function*** | **必需。<br />**<br />规定当事件发生时运行的函数。           |
+
+**可绑定的事件：**
+
+这类类型可以包括如下：
+
+```js
+blur, focus, focusin, focusout, load, resize, scroll, unload, click, dblclick, mousedown, 
+mouseup, mousemove, mouseover, mouseout, mouseenter, mouseleave, change, select, 
+submit, keydown, keypress, keyup, error 。
+```
+
+**练习：**
+
+**示例1：**绑定单个事件
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="./jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+
+    <button id="btn"> 点击我</button>
+</body>
+<script>
+    $(function() {
+
+        $("#btn").bind("click", function() {
+            alert("憨逼点我干啥！")
+        })
+    })
+</script>
+
+</html>
+```
+
+**示例2：**绑定多个事件
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="./jquery-3.5.1.min.js"></script>
+    <style>
+        .test {
+            height: 50px;
+            border: 1px solid rebeccapurple;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="test">
+
+    </div>
+</body>
+<script>
+    $(function() {
+
+        $(".test").bind("mouseenter mouseleave", function() {
+            $(this).append("<span>hello world!</span>")
+        })
+    })
+</script>
+
+</html>
+```
+
+
+
+![mark](http://qiniu.wind-zhou.com/blog/210124/dl5ibhA0Cf.gif)
+
+
+
+#### unbind()
+
+**作用：**
+
+ bind()的反向操作，从每一个匹配的元素中删除绑定的事件。
+
+**语法：**
+
+（1）删除所有的绑定事件。unbind不写参数即可 ``$("p").unbind()`` 。
+
+（2）删除指定类型事件。 例：``$("p").unbind("mouseover")``
+
+（3）**取消某种类型下的某个事件处理函数。**  例：``$("p").unbind("mouseover",func1)``
+
+
+
+**注**：常用于抽奖
+
+
+
+**示例：**抽奖程序，只能抽5次
+
+
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="./jquery-3.5.1.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+    <button id="btn">点我抽奖</button>
+    <div class="show"></div>
+</body>
+<script>
+    $(function() {
+        var count = 5;
+
+        $("#btn").bind("click", function() {
+
+            if (count <= 0) {
+                $(this).unbind("click");
+                alert("别点了，你次数用完了SB！")
+                $(this).css("disabled", "disabled")
+            } else {
+                luck()
+                count--;
+            }
+        })
+
+
+        function luck() {
+            var awardVip = ["小汽车", "iphone", "漂亮妹妹一个", "现金500亿"];
+            var awardOrdinary = ["谢谢惠顾", "谢谢惠顾", "没抽着，气不气！", "加油，还差一点点"];
+            //抽奖五次限制，前四次不中，第五次必中
+            var randomIndex = Math.floor(Math.random() * 4);
+            var price = "";
+            if (count > 1) {
+                price = awardOrdinary[randomIndex];
+                $(".show").append("<p>" + price + "</p>")
+            } else {
+                price = awardVip[randomIndex];
+                $(".show").append("<p>" + price + "</p>")
+            }
+        }
+
+    })
+</script>
+
+</html>
+```
+
+
+
+![mark](http://qiniu.wind-zhou.com/blog/210124/ffCLDD4bFk.gif)
+
+
+
+#### one()
+
+**one的语法结构和bind相同，不过他仅执行一次，执行完成后即解除绑定。**
+
+
+
+## 事件委派
+
+### live()
+
+语法：**$(selector\).live(event,data,function)**
+
+不测试了。1.7+版本 已经废弃
+
+### delegate()
+
+语法：***$(selector).delegate(childSelector,event,data,function)***
+
+***delegate()*** 为指定的元素（被选元素的子元素）添加一个或多个事件处理程序，并规定当这些事件发生时运行的函数。使用 delegate() 方法的事件处理程序适用于当前或未来的元素（比如由脚本创建的新元素）。
+
+
+
+ **示例1：**delegate初体验：
+
+给只给ul里的子元素p绑定事件。
+
+
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="./jquery-3.5.1.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <button id="btn">点击我</button>
+
+    <ul class="nav">
+        <li>1</li>
+        <li class="xxx">2</li>
+        <li class="xxx">3</li>
+    </ul>
+</body>
+<script>
+    $(function() {
+        $(".nav").delegate("p", "click", function() {
+            $(this).css("backgroundColor", "red")
+        })
+
+        $("#btn").click(function() {
+            $(".nav").append("<p> 我是新增加的！</p>")
+        })
+    })
+</script>
+
+</html>
+```
+
+
+
+![mark](http://qiniu.wind-zhou.com/blog/210125/d2mGJd2fB9.gif)
+
+可以看到，只有新增加的p被绑定了事件。
+
+### on()
+
+语法：　***$(selector).on(event,childselector,data,function)***
+
+　***on()*** 为指定的元素,添加一个或多个事件处理程序，并规定当这些事件发生时运行的函数。使用 on() 方法的事件处理程序适用于当前或未来的元素（比如由脚本创建的新元素）
+
+**jquery1.7后，on()是bind()、live()、和delegate()的替代方案。**
+
+**注**：其实.bind(), .live(), .delegate()都是通过.on()来实现的，.unbind(), .die(), .undelegate(),也是一样的都是通过.off()来实现的，
+
+**示例1：**on()初体验
+
+将上面例子用on()进行重构
+
+```js
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="./jquery-3.5.1.min.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <button id="btn">点击我</button>
+
+    <ul class="nav">
+        <li>1</li>
+        <li class="xxx">2</li>
+        <li class="xxx">3</li>
+    </ul>
+</body>
+<script>
+    $(function() {
+        $(".nav").on("click", "p", function() {
+            $(this).css("backgroundColor", "red")
+        })
+
+        $("#btn").click(function() {
+            $(".nav").append("<p> 我是新增加的！</p>")
+        })
+    })
+</script>
+
+</html>
+```
+
+
+
+## 事件类型
+
+![mark](http://qiniu.wind-zhou.com/blog/210125/KFDd5C0G4d.png?imageslim)
+
+![mark](http://qiniu.wind-zhou.com/blog/210125/3dE08iAg4K.png?imageslim)
+
+![mark](http://qiniu.wind-zhou.com/blog/210125/C8D8JJc833.png?imageslim)、
+
+
+
+### 鼠标事件
+
+**鼠标点击事件：**
+
+- click() 点击
+- dlclick () 双击
+- mousedown() 鼠标按下
+- mouseup()   鼠标抬起
+
+**鼠标移动事件：**
+
+- mouseenter()   鼠标划入（没有冒泡）
+- mouseleave()  鼠标划出（没有冒泡）
+- mouseover() 鼠标划入（存在冒泡）
+- mouseout() 鼠标划出 （存在冒泡）
+- mousemove  鼠标移动
+
+### 键盘事件
+
+- keydown   键盘按下  
+- keyup   键盘抬起
+- keypress  按键盘
+
+### 表单事件
+
+- **改变事件**    change 
+
+- **获得焦点**focus；**失去焦点**blur
+
+- **提交事件**  submit  （表单）
+
+### 滚动条事件
+
+- scroll
+
+### resize事件
+
+- resize
+
+注:上面几种事件都和原生js的时间类型基本一样，只不过前面没有了on。
+
+### 合成事件
+
+#### hover()
+
+**定义和用法：**
+
+hover() 方法规定当鼠标指针悬停在被选元素上时要运行的两个函数。
+
+jQuery 1.7 版本前该方法触发 [mouseenter](http://edu.zzfriend.com/jquery/event-mouseenter.html) 和 [mouseleave](http://edu.zzfriend.com/jquery/event-mouseleave.html) 事件。
+
+jQuery 1.8 版本后该方法触发 [mouseover ](http://edu.zzfriend.com/jquery/event-mouseover.html)和 [mouseout ](http://edu.zzfriend.com/jquery/event-mouseout.html)事件。
+
+------
+
+**语法：**
+
+`$(selector).hover(inFunction,outFunction)`
+
+**调用:**
+
+```js
+$( selector ).hover( handlerIn, handlerOut )
+```
+
+**注意：**如果只规定了一个函数，则它将会在 mouseover 和 mouseout 事件上运行。
+
+调用:
+
+```js
+$(selector).hover(handlerInOut)
+```
+
+等同于：
+
+```js
+$( selector ).on( "mouseover mouseout", handlerInOut );
+```
+
+| 参数          | 描述                                            |
+| :------------ | :---------------------------------------------- |
+| *inFunction*  | **必需**。规定 mouseover 事件发生时运行的函数。 |
+| *outFunction* | 可选。规定 mouseout 事件发生时运行的函数。      |
+
+
+
+**示例1：**当鼠标指针悬停在上面时，改变 \<p> 元素的背景颜色：
+
+
+
+```js
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>蚂蚁社区教程(zzfriend.com)</title>
+<script src="https://lib.baomitu.com/jquery/1.10.2/jquery.min.js">
+</script>
+<script>
+$(document).ready(function(){
+  $("p").hover(function(){
+    $("p").css("background-color","yellow");
+    },function(){
+    $("p").css("background-color","pink");
+  });
+});
+</script>
+</head>
+<body>
+
+<p>鼠标移动到该段落。</p>
+
+</body>
+</html>
+
+```
+
+#### toggle()
+
+ **定义和用法:**
+
+toggle() 方法在 jQuery 版本 1.8 中[被废弃](javascript:NewWindow('/try/deprecated.htm');)，在版本 1.9 中被移除。
+
+
+
+toggle() 方法添加两个或多个函数，以响应被选元素的 click 事件之间的切换。
+
+当在元素上点击时调用第一个指定函数，当再次点击时调用第二个函数，以此类推。
+
+**注意：**还存在一个名为 toggle() 的 [jQuery 效果](http://edu.zzfriend.com/jquery/jquery-ref-effects.html)方法。根据不同的参数决定调用哪个方法。
+
+------
+
+ **语法:**
+
+`$(selector).toggle(function1,function2,...)`
+
+| 参数        | 描述                             |
+| :---------- | :------------------------------- |
+| *function*1 | 必需。第一次点击时要运行的函数。 |
+| *function*2 | 第一次点击时要运行的函数。       |
+| function n  | 第n次点击时要运行的函数。        |
+
+## 事件对象
+
+**和原生js一模一样**
+
+
+
+## 补充：
+
+###绑定多事件的处理
+
+> 注：**绑定多事件的处理**
+>
+> 上面几种方法都有多事件绑定方式。
+>
+> 
+>
+> 单事件处理：例如 $(selector).bind("click",data,function);
+>
+> 　多事件处理：
+>
+> 1. 利用空格分隔多事件，例如 `$(selector).bind("click dbclick mouseout",data,function);`
+>
+> 2. 利用大括号灵活定义多事件，例如 `$(selector).bind({event1:function, event2:function, ...})`　　　　　　
+>
+> 　 空格相隔方式：绑定较为死板，不能给事件单独绑定函数,适合处理**多个事件调用同一函数的情况；**
+>
+> 　 大括号替代方式：绑定较为灵活，可以**给事件单独绑定函数。**　　　
+
+### 小结
+
+>差别：
+>
+>.bind()是直接绑定在元素上
+>
+>.live()则是通过冒泡的方式来绑定到元素上的。更适合列表类型的，绑定到document DOM节点上。和.bind()的优势是支持动态数据。
+>
+>.delegate()则是更精确的小范围使用事件代理，性能优于.live()
+>
+>.on()则是最新的1.9版本整合了之前的三种方式的新事件绑定机制
+
+
+
+###Jquery中bind()、live()、delegate()和on()之间的区别详解
+
+>##Jquery中.bind()、.live()、.delegate()和.on()之间的区别详解
+>
+>**简介**
+>
+>最近了解到很多网页开发者对jquery中的 .bind() .live() .delegate() 和 .on() 方法存在很多的疑惑。这些疑惑通常是关于它们之间真正的区别是什么啊，什么时候该使用它们啊。下面本文将给大家详细介绍这四个方法之间的区别，分别对每个方法都进行了详细的介绍，话不多说，来一起看看详细的介绍：
+>
+>在我们深入了解这些方法之前，我们先来一段常见的的HTML，作为我们编写jquery示例方法使用的样本。
+>
+>```js
+><ul id="members" data-role="listview" data-filter="true">
+> <!-- ... 其他li ... -->
+> <li>
+> <a href="detail.html?id=10" rel="external nofollow" >
+>  <h3>John Resig</h3>
+>  <p><strong>jQuery Core Lead</strong></p>
+>  <p>Boston, United States</p>
+> </a>
+> </li>
+> <!-- ... 其他li ... -->
+></ul>
+>```
+>
+>**使用Bind方法**
+>
+>`.bind()`**方法将事件类型和一个事件处理函数直接注册到了被选中的DOM元素中**。这个方法被使用得最久,在此期间,它很好的解决了各种跨浏览器的问题。当使用它来连接事件处理函数时,它仍然非常简洁,但是也存在着一些性能方面的问题,将在下面罗列出来。
+>
+>```js
+>/* .bind() 方法将事件类型和一个事件处理函数直接注册到了被选中的DOM元素中。 
+> .click() 方法只是.bind() 方法的简写。
+>*/
+>
+>$( "#members li a" ).bind( "click", function( e ) {} ); 
+>$( "#members li a" ).click( function( e ) {} ); 
+>```
+>
+>`.bind()`方法将会把事件处理函数连接到所有匹配的a标签。这种方式并不好。这样做的话，它不仅在所有匹配的元素中隐含地迭代附加事件处理函数，而且这些操作非常浪费（多余），因为这些相同的事件处理函数是被一遍一遍的重复的添加到所有匹配的标签上。
+>
+>优点:
+>
+>- 适用于各种浏览器
+>- 连接事件处理函数非常方便快捷
+>- 可以使用` .click()` , `.hover()`等简写方法来更方面地连接事件处理函数
+>- 对于一个简单的ID选择器,使用`.bind() `方法不仅可以很快地连接事件处理函数,而且当事件被触发时, 事件处理函数几乎是马上就被调用了
+>
+>缺点:
+>
+>- 这样方法会将所有的事件处理函数附加到所有匹配的元素
+>- 不可以动态地匹配相同选择器的元素
+>- 当操作大量匹配的元素时会有性能方面的问题
+>- 附加操作是在前期完成的,这可能导致页面加载时存在性能问题
+>
+>**使用Live方法**
+>
+>`.live()`方法使用了**事件委托**的概念来实施其所谓的“魔法”。你调用`live()`方法的方式就像是调用`bind()`方法那样方便。然而在这表面之下， `.live()`方法与前者的实现方式大不相同。` .live()`**方法将与事件处理函数关联的选择器和事件信息一起附加到文档的根级元素（即document）**。通过将事件信息注册到document上，这个事件处理函数将允许所有冒泡到document的事件调用它（例如委托型、传播型事件）。一旦有一个事件冒泡到document元素上，Jquery会根据选择器或者事件的元数据来决定哪一个事件处理函数应该被调用，如果这个事件处理函数存在的话。这个额外的工作将会在用户交互时对性能方面造成一定的影响，但是初始化注册事件的过程相当地快。
+>
+>```js
+>/* 方法将与事件处理函数关联的选择器和事件信息一起附加到文档的根级元素（即document） 
+> ( "#members li a" & "click" ) */
+>
+>$( "#members li a" ).live( "click", function( e ) {} );
+>```
+>
+>.bind()这个例子与上面bind()方法的例子对比的话有一个优点在于它仅仅把事件处理函数附加到document元素一次，而不是很多次。这样不仅更快，而且还减少了性能的浪费。然而，使用这个方法也会带来很多问题，下面将一一列出。
+>
+>优点:
+>
+>- 所有的事件处理函数都只会被注册一次，而不是像`bind()`那样进行多次注册
+>- 将`bind()`方法升级到`live()`方法非常方便，你仅需要将"bind"替代为"live"就可以了
+>- 那些被动态添加到DOM的元素也将被神奇的匹配到，因为真实的事件信息是被注册到document元素上的
+>- 你可以在文档加载完之前连接事件处理函数，这样可以帮助你更好地利用你可能没有用的时间
+>
+>缺点:
+>
+>- 这个方法在Jquery 1.7以后的版本被弃用了，你应该在你的代码里逐步放弃使用它
+>- 使用这个方法时链式操作没有得到正确的支持，可能会出现某些错误
+>- 所做的匹配操作基本上没用因为它只用于在document元素上注册事件处理函数
+>- 使用 `event.stopPropogation() `方法将会没用，因为事件总是已经被委托到了document元素上
+>- 因为所有的选择器或者事件信息都被附加到document元素上了，所以一旦有一个事件要调用某个事件处理函数，Jquery会在一大堆储存的元数据中使用matchesSelector方法来决定哪一个事件处理函数将会被调用，如果这个函数有的话。
+>- 因为你所连接的事件总是被委托到document上，所如果你的DOM的层级很深的话，这会导致一定的性能问题
+>
+>**使用Delegate方法**
+>
+>`.delegate()`方法与`live()`方式实现方式相类似，它不是将选择器或者事件信息附加到document，**而是让你指定附加的元素。**就像是live()方法一样，这个方法使用**事件委托**来正确地工作。
+>
+>如果你跳过了前面关于 `.live() `方法的介绍，你可能要回去重新看看它，因为这里涉及到之前我所阐述的一些内部逻辑
+>
+>```js
+>/* .delegate() 方法会将选择器和事件信息 ( "li a" & "click" ) 附加到你指定的元素上 ( "#members" )。
+>*/
+>
+>$( "#members" ).delegate( "li a", "click", function( e ) {} );
+>```
+>
+>`.delegate()`方法十分强大。在上面这个例子中，与事件处理函数关联的选择器和事件信息将会被附加到( #members" )这个元素上。这样做比使用`live()`高效多了，因为`live()`方法总是将与事件处理函数关联的选择器和事件信息附加到document元素上。另外，使用`.delegate()`方法解决许多其他问题。请参阅下方列出的详细信息。
+>
+>优点:
+>
+>- 你可以选择将选择器或者事件信息附加到指定的元素。
+>- 匹配操作实际上在前面并没有执行，而是用来注册到指定的元素。
+>- 链式操作可以得到正确的支持
+>- Jquery仍然需要迭代这些选择器或者事件信息来匹配元素，不过因为你可以选择哪一个元素作为根元素，所以筛选的量会大幅减少
+>- 因为这项技术使用了事件委托机制，它可以匹配到被动态地添加到DOM的元素
+>- 你可以在文档加载完之前连接事件处理函数
+>
+>缺点:
+>
+>- 从`.bind()`方法不可以直接升级到`.delegate()`方法
+>- Jquery仍然需要使用marchesSelector方法在附加到指定根元素的选择器或者事件信息中筛选决定哪一个事件处理函数会被调用。然而，附加到指定根元素的元数据会比使用`live()`方法的时候要小得多。
+>- 当操作大量匹配的元素时会有性能方面的问题
+>- 附加操作是在前期完成的,这可能导致页面加载时存在性能问题
+>
+>**使用On方法**
+>
+>你知道吗，在Jquery 1.7版本中`.bind() `， `.live() `和`.delegate()`方法只需要使用`.on()`方法一种方式来调用它们。当然`.unbind()` ，` .die() `和.`undelegate()`方法也一样。一下代码片段是从Jquery 1.7版本的源码中截取出来的
+>
+>```js
+>bind: function( types, data, fn ) {
+> return this.on( types, null, data, fn );
+>},
+>unbind: function( types, fn ) {
+> return this.off( types, null, fn );
+>},
+>
+>live: function( types, data, fn ) {
+> jQuery( this.context ).on( types, this.selector, data, fn );
+> return this;
+>},
+>die: function( types, fn ) {
+> jQuery( this.context ).off( types, this.selector || "**", fn );
+> return this;
+>},
+>
+>delegate: function( selector, types, data, fn ) {
+> return this.on( types, selector, data, fn );
+>},
+>undelegate: function( selector, types, fn ) {
+> return arguments.length == 1 ? 
+>  this.off( selector, "**" ) : 
+>  this.off( types, selector, fn );
+>}
+>```
+>
+>考虑到这一点，使用`.on()`方法看起来像以下方式一样...
+>
+>```js
+>/* Jquery的 .bind() , .live() 和 .delegate() 方法只需要使用`.on()`方法一种方式来调用它们 */
+>
+>// Bind
+>$( "#members li a" ).on( "click", function( e ) {} ); 
+>$( "#members li a" ).bind( "click", function( e ) {} );
+>
+>// Live
+>$( document ).on( "click", "#members li a", function( e ) {} ); 
+>$( "#members li a" ).live( "click", function( e ) {} );
+>
+>// Delegate
+>$( "#members" ).on( "click", "li a", function( e ) {} ); 
+>$( "#members" ).delegate( "li a", "click", function( e ) {} );
+>```
+>
+>你可能注意到了，我如何使用`.on()`方法决定了它如何调用其他方法。你可以认为`.on()`方法被具有不同签名的方法”重载“了，而这些方法实现了不同的事件绑定的连接方式。 `.on()`方法的出现为API带来了很多方面的一致性，并希望让事情变得不那么混乱。
+>
+>优点:
+>
+>- 使各种事件绑定方法一致。
+>- 因为在Jquery源码中`.bind()` ， `.live() `和`.delegate()`方法实际上是调用了此方法，因此简化了jQuery代码库并删除了一级重定向。
+>- 这种方式仍然提供了使用`.delegate()`方法的优点，并且仍然提供对`.bind()`方法的支持，如果你需要的话。
+>
+>缺点:
+>
+>- 给人带来了一些疑惑，因为方法的实际执行方式将根据你如何调用方法而改变。
+>
+>**总结**
+>
+>如果你对不同的绑定事件方法有所迷惑，那么不要担心，因为API发展了一段时间了，有很多前人的经验可以借鉴。也有很多人将这些方法视为魔法，不过一旦你了解了他们工作背后的原理，将帮助您了解如何更好地处理项目。
+>以下是这篇文章的精华所在...
+>
+>- 使用`.bind()`方法非常浪费性能因为它把同一个事件处理函数附加到了每一个匹配的元素上
+>- 你应该停止使用`.live()`方法因为它被弃用了同时也会带来很多问题
+>- 使用`.delegate()`方法会给你带来很多好处当你需要解决一些性能上的问题和对动态添加的元素作出处理
+>- 新的`.on()`方法其实就是模拟`.bind()` ， `.live() `和`.delegate()`实现的语法糖，具体取决于你如何调用它
+>- 新的方向是使用新的`.on()`方法。先熟悉语法，并开始在你的所有的Jquery 1.7版本以上的项目使用它吧！
+>
+>
+>
+>[原文链接](http://elijahmanor.com/differences-between-jquery-bind-vs-live-vs-delegate-vs-on/)
+
+
+

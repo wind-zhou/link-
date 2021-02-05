@@ -1,0 +1,223 @@
+# lesson-6 列表样式
+
+list-style-type设置列表前面项目符号
+
+| disc        | 实心圆                   |
+| ----------- | ------------------------ |
+| circle      | 空心圆                   |
+| square      | 正方发行                 |
+| lower-roman | 数字                     |
+| decimal     | 1,2,3                    |
+| upper-alpha | A,B,C                    |
+| lower-alpha | a b c                    |
+| upper-roman | 大写罗马字母             |
+| **none**    | **不显示符号（最常用）** |
+
+设置列表样式时，一般先首先使用	`list-style-type: none;`去掉前面的项目符号。
+
+##水平菜单
+
+用列表制作导航和菜单：
+
+用a标记和table。
+
+a放在li里，设置成块级
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			ul{
+				margin: 0;    /*先去掉之前ul的样式*/
+				padding: 0;
+				list-style-type: none;
+				width: 400px;
+				margin: 0 auto; /*将横向导航水平居中*/
+			}
+			li{
+				width:100px;
+				height:30px;
+				background-color:#800080;/*给li标记设置border-bottom*/
+				border-bottom:2px solid #fff;
+				float: left;	/*设置浮动，可以让块级元素水平排列*/
+			}
+			
+			a{
+				display:block;
+				border-right:1px solid #000;   /*给a标记设置左右border*/
+				border-left:5px solid #000;
+				height: 30px;
+				color:#fff;
+				text-decoration:none;
+				line-height:30px;
+				padding-left:10px;/*直接加给a，不加给状态伪类也可以*/
+			}
+			
+			a:hover{
+				color:#FFFF00;
+				background-color: #A7995A;
+			}
+			
+			
+		</style>
+	</head>
+	<body>
+		<ul>
+			<li> <a href="#">电脑</a></li>
+			<li><a href="#">手机</a></li>
+			<li><a href="#">平板</a></li>
+			<li><a href="#">服务器</a></li>
+		</ul>
+	</body>
+</html>
+
+```
+
+设置居中
+
+
+
+![mark](http://qiniu.wind-zhou.com/blog/201113/aJHE5272l1.png?imageslim)
+
+这个按钮实现功能几个需要注意的点：
+
+1. 菜单用列表的方式实现
+
+2. 先设置垂直菜单，然后在li的css中设置`float: left`将其转换成水平
+
+3. 注意ul和li的宽
+
+   >**float：left  可以让块级元素水平排列。但这是要计算一下ul和li的宽，例如ul设置宽度为400，li设置右边框2px，则li的width应小于或等于98，若超出则会挤到下一行**。
+
+4. li里面的a标记要转换成块级，让其充满li。这样点击一行都可以触发
+
+5. 让水平菜单居中的方式是`margin: 0 auto;`
+
+## 水平二级菜单
+
+源码：
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			ul{                      			/*去掉所有ul的样式*/
+				margin: 0px;
+				padding: 0px;
+				list-style-type: none;
+			}
+			.nav{
+				
+				width:400px;			/*设置外层ul的宽，以及水平居中*/
+				text-align: center;
+				margin: 0 auto;
+			}
+			.nav>li{					/*找到一级li，将其水平化*/
+				width: 99px;
+				background-color: #00FF00;
+				float: left;
+				font-weight: bold;
+				color:white;
+				border-right:#000000 1px solid ;
+			}
+			
+			.nav a{							/*设置超前接的伪状态*/
+				display: block;
+				color: #000000;
+				text-decoration: none;	
+			}
+			.nav a:hover{    					/*设置超前接的伪状态*/
+				text-decoration: underline;
+				background-color: #FFA500;
+				color: #FF0000;
+			}
+			
+			.nav>li ul{							/*设置二级ul的隐藏和显示*/
+				background-color: #00FFFF;
+			    display: none;
+			}
+			
+			.nav>li:hover ul{
+				display: block;
+			}
+			
+		</style> 
+	</head>
+	<body>
+		<ul class="nav">
+			<li>文明的冲突
+				<ul>
+					<li> <a href="#">基督教文明</a></li>
+					<li><a href="#">中华文明</a></li>
+					<li><a href="#">伊斯兰文明</a></li>
+					<li><a href="#">东正教文明</a></li>
+				</ul>	
+			</li>
+			<li>西方
+				<ul>
+					<li> <a href="#">美国</a></li>
+					<li><a href="#">英国</a></li>
+					<li><a href="#">法国</a></li>
+					<li><a href="#">德国</a></li>
+				</ul>	
+			</li>
+			<li>东方
+				<ul>
+					<li> <a href="#">中国</a></li>
+					<li><a href="#">越南</a></li>
+					<li><a href="#">新加坡</a></li>
+					<li><a href="#">马来西亚</a></li>
+				</ul>	
+			</li>
+			<li>中东
+				<ul>
+					<li> <a href="#">土耳其</a></li>
+					<li><a href="#">伊朗</a></li>
+					<li><a href="#">沙特</a></li>
+					<li><a href="#">巴基斯坦</a></li>
+				</ul>	
+			</li>
+			
+		</ul>
+	</body>
+</html>
+
+```
+
+
+
+效果图：
+
+![mark](http://qiniu.wind-zhou.com/blog/201114/65IdkggJjc.png?imageslim)
+
+总结：
+
+>- 代码书写顺序(**由外向内**)
+>  1. 先写出html的嵌套列表
+>  2. 去掉ul和a的样式
+>  3. 将一级li水平化，并设置其样式。
+>  4. 设置超前接的伪状态
+>  5. 设置二级ul的隐藏和显示
+>
+>- 二级菜单**最核心的是隐藏和显示**，见上面代码
+>
+>注：这里的文字的几个样式（居中、颜色）等可以继承，因此设置在里层外层都一样。
+>
+>**但a标记不能继承颜色。**
+
+visibility|hidden
+
+**使用display隐藏和visibility设置隐藏的区别：**
+
+display：none是位置和内容都会隐藏。
+
+visibility：hidden只隐藏内容。
+
+**![mark](http://qiniu.wind-zhou.com/blog/201114/7AflfbB0lH.png?imageslim)**
+

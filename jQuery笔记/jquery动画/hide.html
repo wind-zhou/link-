@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>hide测试</title>
+    <script src="../jquery-3.5.1/jquery-3.5.1.min.js">
+    </script>
+    <style>
+        .con {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+        
+        .four {
+            background: blue;
+            position: relative;
+        }
+        
+        .overlap {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: black;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="btn"> 点击隐藏</button>
+
+    <div class="four con">
+        <div class="overlap"></div>
+    </div>
+
+
+</body>
+
+<script>
+    $(function() {
+
+        $(".overlap").mouseover(function() {
+            $(this).fadeTo(0, 0.4)
+        })
+
+        $(".overlap").mouseout(function() {
+            $(this).fadeTo(0, 0)
+        })
+    })
+</script>
+
+</html>
